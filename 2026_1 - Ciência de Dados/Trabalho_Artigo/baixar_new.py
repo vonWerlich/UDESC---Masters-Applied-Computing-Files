@@ -8,10 +8,6 @@ try:
 except Exception:
     pass
 
-# ==========================================
-# 1. A MÁGICA DA REGRESSÃO: Criando a nossa própria tarefa
-# ==========================================
-# Em vez de importar o ACSIncome engessado, nós definimos o nosso próprio problema.
 # Note que a propriedade 'target_transform' foi removida, o que significa que
 # o alvo (target) continuará sendo o valor monetário bruto (PINCP).
 ACS_Income_Regression = BasicProblem(
@@ -20,15 +16,12 @@ ACS_Income_Regression = BasicProblem(
         'WKHP', 'SEX', 'RAC1P',
     ],
     target='PINCP', 
-    target_transform=None, # O segredo está aqui: nenhuma transformação para True/False
+    target_transform=None, #  nenhuma transformação para True/False
     group='RAC1P',
     preprocess=adult_filter,
     postprocess=lambda x: np.nan_to_num(x, nan=-1.0),
 )
 
-# ==========================================
-# 2. Configurações de Download
-# ==========================================
 anos_pesquisa = [2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022]
 estados_mini_eua = ["IL", "PA", "NC", "CO"] 
 
@@ -42,9 +35,7 @@ for ano in anos_pesquisa:
     
     if 'RELSHIPP' in acs_data.columns and 'RELP' not in acs_data.columns:
         acs_data = acs_data.rename(columns={'RELSHIPP': 'RELP'})
-    
-    # Usamos o nosso problema customizado. 
-    # Ele mesmo já aplica o adult_filter internamente (definido no preprocess acima)
+
     features, label, group = ACS_Income_Regression.df_to_pandas(acs_data)
     
     df_ano = features.copy()
@@ -56,9 +47,7 @@ for ano in anos_pesquisa:
     
     lista_dataframes.append(df_ano)
 
-# ==========================================
-# 3. Fechamento e Exportação
-# ==========================================
+
 df_completo = pd.concat(lista_dataframes, ignore_index=True)
 
 df_completo.to_csv("Base_Folktables_Regressao.csv", index=False)
